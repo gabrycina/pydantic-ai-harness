@@ -119,8 +119,9 @@ When an OS error supplies a filename, `FileSystem` reports it relative to
 - **Containment.** Paths resolve relative to `root_dir`; anything landing
   outside it, via `..` or an absolute path, is rejected. The check is textual
   and shapes policy, not isolation. Symlink targets are not resolved for
-  pattern matching; the workspace is the isolation boundary, so scope it to what
-  the agent is allowed to reach.
+  pattern matching. `LocalWorkspace` does not provide isolation: a symlink can
+  reach outside `root_dir`. For untrusted files, use a backend with enforced
+  isolation and limit its mounts and permissions to the intended files.
 - **Binary detection.** `read_file` treats a NUL byte in the sampled head as
   binary and returns a placeholder instead of dumping the file into model
   context. `file_info` can additionally classify undecodable UTF-8 because it
@@ -139,6 +140,10 @@ need `**`.
 
 These patterns inspect normalized path spellings, not symlink targets. They are
 guardrails for ordinary agent actions, not a filesystem security boundary.
+For example, an allowed `alias.txt` pointing to `creds.secret` bypasses a
+`*.secret` deny rule; an allowed alias can also modify a protected target.
+The current workspace API offers no portable canonical-target or no-follow
+operation, so `FileSystem` cannot enforce these patterns against symlink targets.
 
 | Field | Effect |
 |---|---|
