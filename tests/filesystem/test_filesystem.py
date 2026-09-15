@@ -381,7 +381,7 @@ async def test_read_file_reports_unknown_binary_size_without_a_second_lookup(
         return FileWindow(lines=(), start_line=offset, has_more=False, total_lines=None, binary=True, byte_size=None)
 
     async def unexpected_stat(_: str) -> WorkspaceFileEntry:
-        raise AssertionError('read_file must not require a second metadata lookup')
+        raise AssertionError('read_file must not require a second metadata lookup')  # pragma: no cover
 
     monkeypatch.setattr(workspace, 'read_file', read_binary)
     monkeypatch.setattr(workspace, 'stat', unexpected_stat)
